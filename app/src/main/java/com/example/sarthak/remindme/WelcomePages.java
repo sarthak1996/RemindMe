@@ -4,10 +4,10 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Build;
+import android.os.Bundle;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 import android.text.Html;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -26,11 +26,37 @@ public class WelcomePages extends AppCompatActivity {
     private LinearLayout dotsLayout;
     private int[] layouts;
     private TextView[] dots;
+    ViewPager.OnPageChangeListener viewPagerPageChangeListener = new ViewPager.OnPageChangeListener() {
+
+        @Override
+        public void onPageSelected(int position) {
+            addBottomDots(position);
+
+            /*Changing the button text Next to Got it for the last page*/
+            if (position == layouts.length - 1) {
+                btnNext.setText(getString(R.string.gotIt));
+                btnSkip.setVisibility(View.GONE);
+            } else {
+                btnNext.setText(getString(R.string.next));
+                btnSkip.setVisibility(View.VISIBLE);
+            }
+        }
+
+        @Override
+        public void onPageScrolled(int arg0, float arg1, int arg2) {
+
+        }
+
+        @Override
+        public void onPageScrollStateChanged(int arg0) {
+
+        }
+    };
     private CustomViewPagerAdapter customViewPagerAdapter;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        getSupportActionBar().hide();
         /*Checking for first time launch*/
         prefManagerWelcomeScreen = new PrefManagerWelcomeScreen(this);
         if (!prefManagerWelcomeScreen.isFirstTimeLaunch()) {
@@ -86,34 +112,6 @@ public class WelcomePages extends AppCompatActivity {
             }
         });
     }
-
-
-    ViewPager.OnPageChangeListener viewPagerPageChangeListener = new ViewPager.OnPageChangeListener() {
-
-        @Override
-        public void onPageSelected(int position) {
-            addBottomDots(position);
-
-            /*Changing the button text Next to Got it for the last page*/
-            if (position == layouts.length - 1) {
-                btnNext.setText(getString(R.string.gotIt));
-                btnSkip.setVisibility(View.GONE);
-            } else {
-                btnNext.setText(getString(R.string.next));
-                btnSkip.setVisibility(View.VISIBLE);
-            }
-        }
-
-        @Override
-        public void onPageScrolled(int arg0, float arg1, int arg2) {
-
-        }
-
-        @Override
-        public void onPageScrollStateChanged(int arg0) {
-
-        }
-    };
 
     private void launchHomeScreen() {
         prefManagerWelcomeScreen.setFirstTimeLaunch(false);

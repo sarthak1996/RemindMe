@@ -15,5 +15,9 @@
     <string name="welcome_page3_description">Description Page3</string>
     <string name="welcome_page4_title">Page4 Title</string>
     <string name="welcome_page4_description">Description Page4</string>
+    <string name="options">Options</string>
+    <string name="reminder">Reminder</string>
+    <string name="location_based_reminder">Location Based Reminder</string>
+    <string name="notes">Notes</string>
 
 </resources>

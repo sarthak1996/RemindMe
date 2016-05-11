@@ -3,13 +3,19 @@ package com.example.sarthak.remindme;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.design.widget.NavigationView;
+import android.support.v4.view.GravityCompat;
+import android.support.v4.widget.DrawerLayout;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.StaggeredGridLayoutManager;
+import android.support.v7.widget.Toolbar;
 import android.util.SparseBooleanArray;
 import android.view.GestureDetector;
+import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Toast;
@@ -28,12 +34,18 @@ public class MainActivity extends AppCompatActivity {
     private RecyclerView recyclerView;
     private SparseBooleanArray selectedItems;
     private CardView cardView;
+    private DrawerLayout drawerLayout;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        getSupportActionBar().setTitle("Upcoming Reminders");
+        Toolbar toolbar = (Toolbar) findViewById(R.id.main_toolbar);
+        setSupportActionBar(toolbar);
+        ActionBar actionBar = getSupportActionBar();
+        actionBar.setHomeAsUpIndicator(R.mipmap.ic_launcher);
+        actionBar.setDisplayHomeAsUpEnabled(true);
+        toolbar.setTitle("Upcoming Reminders");
         selectedItems=new SparseBooleanArray();
         /*RecyclerView For Upcoming Events*/
         staggeredGridLayoutManager = new StaggeredGridLayoutManager(2, 1);
@@ -56,16 +68,28 @@ public class MainActivity extends AppCompatActivity {
                 if (selectedItems.get(position, false)) {
                     selectedItems.delete(position);
                     cardView.setSelected(false);
-                    cardView.setCardBackgroundColor(R.attr.cardBackgroundColor);
                 }
                 else {
                     selectedItems.put(position, true);
-                    Toast.makeText(MainActivity.this, "Long Clicked", Toast.LENGTH_SHORT).show();
                     cardView.setSelected(true);
-                    cardView.setCardBackgroundColor(R.attr.selectableItemBackground);
                 }
             }
         }));
+
+
+        /*Setting up the drawer*/
+        drawerLayout=(DrawerLayout)findViewById(R.id.drawer_layout);
+        NavigationView navigationView = (NavigationView) findViewById(R.id.navigation_view);
+        navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
+            @Override
+            public boolean onNavigationItemSelected(MenuItem menuItem) {
+                menuItem.setChecked(true);
+                drawerLayout.closeDrawers();
+                Toast.makeText(MainActivity.this, menuItem.getTitle(), Toast.LENGTH_LONG).show();
+                return true;
+            }
+        });
+
     }
 
     private void initializeReminders() {
@@ -78,6 +102,21 @@ public class MainActivity extends AppCompatActivity {
         reminders.add(new Reminder("Temporary disturbance", 1203));
     }
 
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Handle action bar item clicks here. The action bar will
+        // automatically handle clicks on the Home/Up button, so long
+        // as you specify a parent activity in AndroidManifest.xml.
+        int id = item.getItemId();
+
+        switch (id) {
+            case android.R.id.home:
+                drawerLayout.openDrawer(GravityCompat.START);
+                return true;
+        }
+
+        return super.onOptionsItemSelected(item);
+    }
 
     public interface ClickListener {
         void onClick(View view, int position);

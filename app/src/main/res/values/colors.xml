@@ -38,4 +38,8 @@
         <item>@color/welcome_dot_dark_screen4</item>
     </array>
 
+    <!--Other Colors-->
+    <color name="grey">#9E9E9E</color>
+    <color name="white">#FFFFFF</color>
+
 </resources>
