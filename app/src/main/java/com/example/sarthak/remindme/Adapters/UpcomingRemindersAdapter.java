@@ -6,7 +6,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.example.sarthak.remindme.R;
 import com.example.sarthak.remindme.Reminder;
@@ -43,17 +42,19 @@ public class UpcomingRemindersAdapter extends RecyclerView.Adapter<UpcomingRemin
         return reminders.size();
     }
 
-    public class CustomAdapterUpComingReminders extends RecyclerView.ViewHolder {
+    public class CustomAdapterUpComingReminders extends RecyclerView.ViewHolder{
         private TextView title;
-        private int position;
+
         public CustomAdapterUpComingReminders(View view) {
             super(view);
+            view.setClickable(true);
             this.title = (TextView) view.findViewById(R.id.textViewTitleUpComingEvents);
         }
 
         public void setTitle(String title) {
             this.title.setText(title);
         }
+
     }
 }
 

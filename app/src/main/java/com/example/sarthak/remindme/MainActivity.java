@@ -4,8 +4,11 @@ import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.CardView;
+import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.StaggeredGridLayoutManager;
+import android.util.SparseBooleanArray;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.View;
@@ -23,19 +26,24 @@ public class MainActivity extends AppCompatActivity {
     private ArrayList<Reminder> reminders;
     private UpcomingRemindersAdapter adapter;
     private RecyclerView recyclerView;
+    private SparseBooleanArray selectedItems;
+    private CardView cardView;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         getSupportActionBar().setTitle("Upcoming Reminders");
+        selectedItems=new SparseBooleanArray();
         /*RecyclerView For Upcoming Events*/
         staggeredGridLayoutManager = new StaggeredGridLayoutManager(2, 1);
         recyclerView = (RecyclerView) findViewById(R.id.recyclerViewUpComingReminders);
         recyclerView.setLayoutManager(staggeredGridLayoutManager);
         initializeReminders();
         adapter = new UpcomingRemindersAdapter(reminders, MainActivity.this);
+        recyclerView.setItemAnimator(new DefaultItemAnimator());
         recyclerView.setAdapter(adapter);
+
         recyclerView.addOnItemTouchListener(new RecyclerTouchListener(getApplicationContext(), recyclerView, new ClickListener() {
             @Override
             public void onClick(View view, int position) {
@@ -44,7 +52,18 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public void onLongClick(View view, int position) {
-                Toast.makeText(MainActivity.this, "Long Clicked", Toast.LENGTH_SHORT).show();
+                cardView=(CardView)view.findViewById(R.id.cardView_UpcomingReminders);
+                if (selectedItems.get(position, false)) {
+                    selectedItems.delete(position);
+                    cardView.setSelected(false);
+                    cardView.setCardBackgroundColor(R.attr.cardBackgroundColor);
+                }
+                else {
+                    selectedItems.put(position, true);
+                    Toast.makeText(MainActivity.this, "Long Clicked", Toast.LENGTH_SHORT).show();
+                    cardView.setSelected(true);
+                    cardView.setCardBackgroundColor(R.attr.selectableItemBackground);
+                }
             }
         }));
     }
