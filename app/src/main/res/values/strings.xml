@@ -1,0 +1,19 @@
+<resources>
+    <string name="app_name">RemindMe</string>
+
+    <!--Welcome Screen Strings-->
+    <string name="next">NEXT</string>
+    <string name="skip">SKIP</string>
+    <string name="gotIt">GOT IT</string>
+
+    <!--Welcome Screen Contents-->
+    <string name="welcome_page1_title">Page1 Title</string>
+    <string name="welcome_page1_description">Description Page1</string>
+    <string name="welcome_page2_title">Page2 Title</string>
+    <string name="welcome_page2_description">Description Page2</string>
+    <string name="welcome_page3_title">Page3 Title</string>
+    <string name="welcome_page3_description">Description Page3</string>
+    <string name="welcome_page4_title">Page4 Title</string>
+    <string name="welcome_page4_description">Description Page4</string>
+
+</resources>
