@@ -1,4 +1,4 @@
-package com.example.sarthak.remindme;
+package com.example.sarthak.remindme.ObjectClasses;
 
 /**
  * Created by sarthak on 11/5/16.

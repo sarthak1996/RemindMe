@@ -6,4 +6,5 @@ package com.example.sarthak.remindme;
 public interface Config {
     public String prefName="AppPref";
     public String firstTimeLaunch="firstTimeLaunch";
+    public String reminderAt="ReminderAt";
 }

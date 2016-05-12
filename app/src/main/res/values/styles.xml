@@ -10,4 +10,11 @@
         <item name="windowNoTitle">true</item>
     </style>
 
+    <style name="ViewReminderTheme" parent="AppTheme" >
+        <item name="colorAccent">@color/lime</item>
+        <item name="colorPrimaryDark">@color/amberDark</item>
+        <item name="colorPrimary">@color/amber</item>
+    </style>
+
+
 </resources>

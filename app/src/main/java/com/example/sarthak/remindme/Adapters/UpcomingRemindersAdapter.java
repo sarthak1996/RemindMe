@@ -7,8 +7,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import com.example.sarthak.remindme.ObjectClasses.Reminder;
 import com.example.sarthak.remindme.R;
-import com.example.sarthak.remindme.Reminder;
 
 import java.util.ArrayList;
 
