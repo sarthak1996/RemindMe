@@ -19,21 +19,22 @@ import java.util.ArrayList;
  * Created by sarthak on 12/5/16.
  */
 public class ViewReminder extends AppCompatActivity {
-    private int position=-1;
+    private int position = -1;
     private RecyclerView recyclerView;
     private ViewReminderAdapter adapter;
-    private int icons[]={R.drawable.ic_label_black_24dp,R.drawable.ic_alarm_on_black_24dp};
-    private String title[]={"Description","Time"};
+    private int icons[] = {R.drawable.ic_label_black_24dp, R.drawable.ic_alarm_on_black_24dp};
+    private String title[] = {"Description", "Time"};
     private ArrayList<ViewReminderObject> viewReminderObject;
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         Intent intent = getIntent();
         if (intent != null) {
-            position=intent.getExtras().getInt(Config.reminderAt);
+            position = intent.getExtras().getInt(Config.reminderAt);
         }
         setContentView(R.layout.activity_view_reminder);
-        if(position==-1){
+        if (position == -1) {
             Toast.makeText(ViewReminder.this, "Unexpected Error occured", Toast.LENGTH_SHORT).show();
             finish();
         }
@@ -46,13 +47,16 @@ public class ViewReminder extends AppCompatActivity {
         actionBar.setDisplayHomeAsUpEnabled(true);
 
         /*Setting up recycler view*/
-        recyclerView=(RecyclerView)findViewById(R.id.recyclerView_ViewReminders);
+        recyclerView = (RecyclerView) findViewById(R.id.recyclerView_ViewReminders);
         recyclerView.setLayoutManager(new LinearLayoutManager(ViewReminder.this));
         initializeListObjects();
-        adapter=new ViewReminderAdapter(viewReminderObject,ViewReminder.this);
+        adapter = new ViewReminderAdapter(viewReminderObject, ViewReminder.this);
         recyclerView.setAdapter(adapter);
     }
-    private void initializeListObjects(){
 
+    private void initializeListObjects() {
+        viewReminderObject=new ArrayList<>();
+        for (int i = 0; i < icons.length; i++)
+            viewReminderObject.add(new ViewReminderObject(icons[i], title[i], "Something Something"));
     }
 }
