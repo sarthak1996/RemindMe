@@ -11,6 +11,7 @@ import com.example.sarthak.remindme.ObjectClasses.Reminder;
 import com.example.sarthak.remindme.R;
 
 import java.util.ArrayList;
+import java.util.Random;
 
 /**
  * Created by sarthak on 11/5/16.
@@ -18,6 +19,7 @@ import java.util.ArrayList;
 public class UpcomingRemindersAdapter extends RecyclerView.Adapter<UpcomingRemindersAdapter.CustomAdapterUpComingReminders> {
     private ArrayList<Reminder> reminders;
     private Context context;
+    private Random random;
 
     public UpcomingRemindersAdapter(ArrayList<Reminder> reminders, Context context) {
         this.reminders = reminders;
@@ -35,6 +37,19 @@ public class UpcomingRemindersAdapter extends RecyclerView.Adapter<UpcomingRemin
     public void onBindViewHolder(CustomAdapterUpComingReminders holder, int position) {
         Reminder reminder = reminders.get(position);
         holder.setTitle(reminder.getTitle());
+        holder.setDescription(reminder.getDescription());
+        String modifiedText = "" + reminder.getDay() + " " + getMonth(reminder.getMonth()) + " , " + reminder.getYear();
+        holder.setDate(modifiedText);
+        if (reminder.getMinutes() == -1 || reminder.getHours() == -1)
+            modifiedText = "All day";
+        else
+            modifiedText=""+reminder.getHours()+":"+reminder.getMinutes();
+            holder.setTime(modifiedText);
+    }
+
+    private String getMonth(int month) {
+        String months[] = {"January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"};
+        return months[month];
     }
 
     @Override
@@ -42,19 +57,36 @@ public class UpcomingRemindersAdapter extends RecyclerView.Adapter<UpcomingRemin
         return reminders.size();
     }
 
-    public class CustomAdapterUpComingReminders extends RecyclerView.ViewHolder{
+    public class CustomAdapterUpComingReminders extends RecyclerView.ViewHolder {
         private TextView title;
+        private TextView description;
+        private TextView date;
+        private TextView time;
 
         public CustomAdapterUpComingReminders(View view) {
             super(view);
             view.setClickable(true);
             this.title = (TextView) view.findViewById(R.id.textViewTitleUpComingEvents);
+            this.description = (TextView) view.findViewById(R.id.textView_upcomingRemindersDescription);
+            this.date = (TextView) view.findViewById(R.id.textView_upcomingRemindersDate);
+            this.time = (TextView) view.findViewById(R.id.textView_upcomingRemindersTime);
         }
 
         public void setTitle(String title) {
             this.title.setText(title);
         }
 
+        public void setDescription(String description) {
+            this.description.setText(description);
+        }
+
+        public void setDate(String date) {
+            this.date.setText(date);
+        }
+
+        public void setTime(String time) {
+            this.time.setText(time);
+        }
     }
 }
 

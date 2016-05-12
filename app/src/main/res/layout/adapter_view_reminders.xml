@@ -11,7 +11,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
-        android:layout_weight="3"/>
+        android:layout_weight="3" />
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -26,16 +26,42 @@
             android:layout_height="wrap_content"
             android:text="Title"
             android:textColor="@android:color/black"
-            android:textSize="20dp"/>
+            android:textSize="20dp" />
 
-        <TextView
-            android:id="@+id/textView_ViewReminderInfoListElement"
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
-            android:text="Info"
-            android:textColor="@android:color/darker_gray"
-            android:textSize="16dp" />
+            android:orientation="horizontal">
+
+            <TextView
+                android:id="@+id/textView_ViewReminderInfoListElement"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:text="Date"
+                android:textColor="@android:color/darker_gray"
+                android:textSize="16dp" />
+            <ImageView
+                android:id="@+id/imageView_clock_date_time_viewReminder"
+                android:layout_width="16dp"
+                android:layout_height="16dp"
+                android:layout_gravity="center"
+                android:layout_marginLeft="5dp"
+                android:layout_marginRight="5dp"
+                android:src="@drawable/ic_alarm_on_black_24dp"
+                android:visibility="gone" />
+            <TextView
+                android:id="@+id/textView_ViewReminderTime"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:text="Time"
+                android:textColor="@android:color/darker_gray"
+                android:textSize="16dp"
+                android:visibility="gone"/>
+
+        </LinearLayout>
 
     </LinearLayout>
 

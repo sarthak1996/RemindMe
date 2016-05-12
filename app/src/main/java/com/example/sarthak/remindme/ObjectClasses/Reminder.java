@@ -1,21 +1,27 @@
 package com.example.sarthak.remindme.ObjectClasses;
 
+import java.util.Comparator;
+
 /**
  * Created by sarthak on 11/5/16.
  */
-public class Reminder {
-    private String title;
-    private String description;
-    private long timeInMillis;
-    private int day;
-    private int month;
-    private int year;
-    private int minutes;
-    private int hours;
+public class Reminder implements Comparator<Reminder> {
+    private String title="";
+    private String description="";
+    private long timeInMillis=-1;
+    private int day=-1;
+    private int month=-1;
+    private int year=-1;
+    private int minutes=-1;
+    private int hours=-1;
 
-    public Reminder(String title, long timeInMillis){
-        this.timeInMillis=timeInMillis;
-        this.title=title;
+    public Reminder() {
+
+    }
+
+    public Reminder(String title, long timeInMillis) {
+        this.timeInMillis = timeInMillis;
+        this.title = title;
     }
 
     public String getTitle() {
@@ -80,5 +86,13 @@ public class Reminder {
 
     public void setHours(int hours) {
         this.hours = hours;
+    }
+
+
+    @Override
+    public int compare(Reminder lhs, Reminder rhs) {
+        if(lhs.timeInMillis<rhs.timeInMillis)
+            return 1;
+        return -1;
     }
 }
