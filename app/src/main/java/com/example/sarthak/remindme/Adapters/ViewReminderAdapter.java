@@ -43,7 +43,7 @@ public class ViewReminderAdapter extends  RecyclerView.Adapter<ViewReminderAdapt
 
     @Override
     public int getItemCount() {
-        return 0;
+        return viewReminderObjects.size();
     }
 
     public class CustomAdapterViewReminder extends RecyclerView.ViewHolder{

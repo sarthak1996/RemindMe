@@ -91,7 +91,11 @@ public class MainActivity extends AppCompatActivity {
             public boolean onNavigationItemSelected(MenuItem menuItem) {
                 menuItem.setChecked(true);
                 drawerLayout.closeDrawers();
-                Toast.makeText(MainActivity.this, menuItem.getTitle(), Toast.LENGTH_LONG).show();
+                if(menuItem.getTitle().equals(MainActivity.this.getString(R.string.reminder))){
+                    Intent intent=new Intent(MainActivity.this,ViewReminder.class);
+                    intent.putExtra(Config.launchType,"ADD");
+                    startActivity(intent);
+                }
                 return true;
             }
         });
