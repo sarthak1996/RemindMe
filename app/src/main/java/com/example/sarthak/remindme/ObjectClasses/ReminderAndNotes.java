@@ -5,7 +5,7 @@ import java.util.Comparator;
 /**
  * Created by sarthak on 11/5/16.
  */
-public class Reminder implements Comparator<Reminder> {
+public class ReminderAndNotes implements Comparator<ReminderAndNotes> {
     private String title="";
     private String description="";
     private long timeInMillis=-1;
@@ -14,12 +14,13 @@ public class Reminder implements Comparator<Reminder> {
     private int year=-1;
     private int minutes=-1;
     private int hours=-1;
+    private String type="";
 
-    public Reminder() {
+    public ReminderAndNotes() {
 
     }
 
-    public Reminder(String title, long timeInMillis) {
+    public ReminderAndNotes(String title, long timeInMillis) {
         this.timeInMillis = timeInMillis;
         this.title = title;
     }
@@ -88,9 +89,16 @@ public class Reminder implements Comparator<Reminder> {
         this.hours = hours;
     }
 
+    public String getType(){
+        return type;
+    }
+
+    public void setType(char type){
+        this.type=""+type;
+    }
 
     @Override
-    public int compare(Reminder lhs, Reminder rhs) {
+    public int compare(ReminderAndNotes lhs, ReminderAndNotes rhs) {
         if(lhs.timeInMillis<rhs.timeInMillis)
             return 1;
         return -1;

@@ -19,5 +19,8 @@
     <string name="reminder">Reminder</string>
     <string name="location_based_reminder">Location Based Reminder</string>
     <string name="notes">Notes</string>
+    <string name="recycle_bin">Recycle Bin</string>
+    <string name="action_delete_selected_items">Delete</string>
+    <string name="upcoming_reminder">Upcoming Reminders</string>
 
 </resources>

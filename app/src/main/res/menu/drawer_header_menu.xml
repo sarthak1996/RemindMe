@@ -2,16 +2,20 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
 
     <group android:checkableBehavior="single">
-        <item
-            android:id="@+id/navigation_item_attachment"
+        <item android:id="@+id/navigation_item_upcoming_reminder"
             android:checked="true"
+            android:title="@string/upcoming_reminder"></item>
+        <item
+            android:id="@+id/navigation_item_reminder"
             android:title="@string/reminder" />
         <item
-            android:id="@+id/navigation_item_images"
+            android:id="@+id/navigation_item_location_based_reminder"
             android:title="@string/location_based_reminder" />
         <item
-            android:id="@+id/navigation_item_location"
+            android:id="@+id/navigation_item_notes"
             android:title="@string/notes" />
+        <item android:id="@+id/navigation_item_recycle_bin"
+            android:title="@string/recycle_bin"/>
     </group>
 
 </menu>

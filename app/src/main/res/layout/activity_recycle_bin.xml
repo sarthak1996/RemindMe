@@ -2,7 +2,7 @@
 <android.support.v4.widget.DrawerLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:id="@+id/drawer_layout"
+    android:id="@+id/recycle_bin_drawer_layout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fitsSystemWindows="true">
@@ -12,7 +12,7 @@
         android:layout_height="match_parent">
 
         <android.support.v7.widget.Toolbar
-            android:id="@+id/main_toolbar"
+            android:id="@+id/recycle_bin_toolbar"
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
             android:background="?attr/colorPrimary"
@@ -20,23 +20,15 @@
 
 
         <android.support.v7.widget.RecyclerView
-            android:id="@+id/recyclerViewUpComingReminders"
+            android:id="@+id/recyclerViewDeletedReminders"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_below="@id/main_toolbar"></android.support.v7.widget.RecyclerView>
+            android:layout_below="@id/recycle_bin_toolbar"></android.support.v7.widget.RecyclerView>
 
-        <android.support.design.widget.FloatingActionButton
-            android:id="@+id/fab_add_main"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentBottom="true"
-            android:layout_alignParentRight="true"
-            android:layout_margin="@dimen/fab_margin"
-            android:src="@drawable/ic_edit_white_24dp"/>
     </RelativeLayout>
 
     <android.support.design.widget.NavigationView
-        android:id="@+id/navigation_view"
+        android:id="@+id/recycle_bin_navigation_view"
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
         android:layout_gravity="start"

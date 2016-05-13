@@ -20,6 +20,10 @@
         <activity android:name=".ViewReminder"
             android:parentActivityName=".MainActivity"
             android:theme="@style/ViewReminderTheme"></activity>
+        <activity android:name=".RemindMeAgainNotification"
+            android:theme="@style/AppTheme"></activity>
+        <activity android:name=".RecycleBin"
+            android:theme="@style/AppTheme"></activity>
         <receiver android:name=".NotificationAlarm" />
     </application>
 

@@ -31,7 +31,7 @@ import android.widget.Toast;
 import com.afollestad.materialdialogs.DialogAction;
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.example.sarthak.remindme.Adapters.ViewReminderAdapter;
-import com.example.sarthak.remindme.ObjectClasses.Reminder;
+import com.example.sarthak.remindme.ObjectClasses.ReminderAndNotes;
 import com.example.sarthak.remindme.ObjectClasses.ViewReminderObject;
 import com.google.gson.Gson;
 
@@ -45,7 +45,7 @@ public class ViewReminder extends AppCompatActivity {
     private int position = -1;
     private RecyclerView recyclerView;
     private ViewReminderAdapter adapter;
-    private Reminder reminder;
+    private ReminderAndNotes reminder;
     private int lastReminderPosition;
     private int flag = 0;
     private Calendar calendar;
@@ -84,7 +84,7 @@ public class ViewReminder extends AppCompatActivity {
         actionBar.setDisplayHomeAsUpEnabled(true);
         actionBar.setDisplayHomeAsUpEnabled(true);
 
-        reminder = new Reminder();
+        reminder = new ReminderAndNotes();
         sharedPreferences = getSharedPreferences(Config.prefName, MODE_PRIVATE);
         textViewTitle = (TextView) findViewById(R.id.textView_ViewReminderTitle);
         if (flag == 0) {
@@ -199,7 +199,7 @@ public class ViewReminder extends AppCompatActivity {
                 Toast.makeText(ViewReminder.this, "Enter date", Toast.LENGTH_SHORT).show();
             }
         } else {
-            Toast.makeText(ViewReminder.this, "Enter a title", Toast.LENGTH_SHORT).show();
+            super.onBackPressed();
         }
     }
 
@@ -274,8 +274,9 @@ public class ViewReminder extends AppCompatActivity {
         builder.setSound(uri);
         PendingIntent intent = PendingIntent.getActivity(ViewReminder.this, 0, new Intent(ViewReminder.this, MainActivity.class), 0);
         builder.setContentIntent(intent);
-
-        PendingIntent remindMeAgainIn = PendingIntent.getActivity(ViewReminder.this, 0, new Intent(ViewReminder.this, RemindMeAgainNotification.class), 0);
+        Intent remindMeAgainIntent=new Intent(ViewReminder.this, RemindMeAgainNotification.class);
+        remindMeAgainIntent.putExtra(Config.reminderAt,position);
+        PendingIntent remindMeAgainIn = PendingIntent.getActivity(ViewReminder.this, 0,remindMeAgainIntent , PendingIntent.FLAG_UPDATE_CURRENT);
         NotificationCompat.Action action =
                 new NotificationCompat.Action.Builder(R.drawable.ic_alarm_on_black_24dp, "Remind me again at", remindMeAgainIn).build();
         builder.addAction(action);
@@ -296,7 +297,7 @@ public class ViewReminder extends AppCompatActivity {
         Gson gson = new Gson();
         String json = sharedPreferences.getString(Config.objectReminder + position, "");
         if (json != null && !json.equals("") && !json.isEmpty()) {
-            reminder = gson.fromJson(json, Reminder.class);
+            reminder = gson.fromJson(json, ReminderAndNotes.class);
         }
     }
 

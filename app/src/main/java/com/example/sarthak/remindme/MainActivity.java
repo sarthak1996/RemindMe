@@ -1,9 +1,13 @@
 package com.example.sarthak.remindme;
 
+import android.app.NotificationManager;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Color;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
@@ -15,13 +19,17 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.util.SparseBooleanArray;
+import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
 
+import com.afollestad.materialdialogs.DialogAction;
+import com.afollestad.materialdialogs.MaterialDialog;
 import com.example.sarthak.remindme.Adapters.UpcomingRemindersAdapter;
-import com.example.sarthak.remindme.ObjectClasses.Reminder;
+import com.example.sarthak.remindme.ObjectClasses.ReminderAndNotes;
 import com.google.gson.Gson;
 
 import java.util.ArrayList;
@@ -32,7 +40,7 @@ import java.util.Calendar;
  */
 public class MainActivity extends AppCompatActivity {
     private StaggeredGridLayoutManager staggeredGridLayoutManager;
-    private ArrayList<Reminder> reminders;
+    private ArrayList<ReminderAndNotes> reminders;
     private UpcomingRemindersAdapter adapter;
     private RecyclerView recyclerView;
     private SparseBooleanArray selectedItems;
@@ -40,6 +48,10 @@ public class MainActivity extends AppCompatActivity {
     private int lastReminderPosition;
     private SharedPreferences sharedPreferences;
     private DrawerLayout drawerLayout;
+    private MenuItem deleteSelectedItems;
+    private FloatingActionButton floatingActionButtonAdd;
+    private String choicesAdd[]={"Note","Reminder","Location Based Reminder"};
+    private int selectionMadeAdd=-1;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -86,10 +98,11 @@ public class MainActivity extends AppCompatActivity {
                 cardView = (CardView) view.findViewById(R.id.cardView_UpcomingReminders);
                 if (selectedItems.get(position, false)) {
                     selectedItems.delete(position);
-                    cardView.setSelected(false);
+                    cardView.setCardBackgroundColor(Color.WHITE);
                 } else {
                     selectedItems.put(position, true);
-                    cardView.setSelected(true);
+                    cardView.setCardBackgroundColor(Color.GRAY);
+                    deleteSelectedItems.setVisible(true);
                 }
             }
         }));
@@ -112,7 +125,61 @@ public class MainActivity extends AppCompatActivity {
                 if (menuItem.getTitle().equals(MainActivity.this.getString(R.string.notes))) {
 
                 }
+                if (menuItem.getTitle().equals(MainActivity.this.getString(R.string.recycle_bin))) {
+                    Intent intent=new Intent(MainActivity.this,RecycleBin.class);
+                    startActivity(intent);
+                }
+                if (menuItem.getTitle().equals(MainActivity.this.getString(R.string.upcoming_reminder))) {
+                    /*Do nothing since already in the main activity*/
+                }
                 return true;
+            }
+        });
+
+        /*Setting up Floating action button*/
+        floatingActionButtonAdd=(FloatingActionButton)findViewById(R.id.fab_add_main);
+        floatingActionButtonAdd.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                boolean wrapInScrollView = true;
+                new MaterialDialog.Builder(MainActivity.this)
+                        .title("Type of item")
+                        .items(choicesAdd)
+                        .itemsCallbackSingleChoice(0, new MaterialDialog.ListCallbackSingleChoice() {
+                            @Override
+                            public boolean onSelection(MaterialDialog dialog, View view, int which, CharSequence text) {
+                                /**
+                                 * If you use alwaysCallSingleChoiceCallback(), which is discussed below,
+                                 * returning false here won't allow the newly selected radio button to actually be selected.
+                                 **/
+                                selectionMadeAdd=which;
+                                Log.d("Check",""+selectionMadeAdd);
+                                switch (selectionMadeAdd){
+                                    case 0:
+                                        break;
+                                    case 1:
+                                        Intent intent = new Intent(MainActivity.this, ViewReminder.class);
+                                        intent.putExtra(Config.launchType, "ADD");
+                                        intent.putExtra(Config.lastReminderPosition, lastReminderPosition);
+                                        startActivity(intent);
+                                        break;
+                                    case 2:
+                                        break;
+                                    default:break;
+
+                                }
+                                return true;
+                            }
+                        })
+                        .positiveText("Choose")
+                        .negativeText("Cancel")
+                        .onNegative(new MaterialDialog.SingleButtonCallback() {
+                            @Override
+                            public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
+                                dialog.dismiss();
+                            }
+                        })
+                        .show();
             }
         });
 
@@ -128,7 +195,7 @@ public class MainActivity extends AppCompatActivity {
                 break;
             }
             position++;
-            Reminder rem = gson.fromJson(json, Reminder.class);
+            ReminderAndNotes rem = gson.fromJson(json, ReminderAndNotes.class);
             Calendar calendar = Calendar.getInstance();
             if (rem.getDay() == calendar.get(Calendar.DAY_OF_MONTH) && rem.getMonth() == calendar.get(Calendar.MONTH) && rem.getYear() == calendar.get(Calendar.YEAR))
                 reminders.add(rem);
@@ -147,9 +214,35 @@ public class MainActivity extends AppCompatActivity {
             case android.R.id.home:
                 drawerLayout.openDrawer(GravityCompat.START);
                 return true;
+            case R.id.action_delete_selected_items:
+                deleteSelectedItems.setVisible(false);
+                SharedPreferences sharedPreferencesRecycle=getSharedPreferences(Config.recycleBin,MODE_PRIVATE);
+                SharedPreferences.Editor recycleEditor=sharedPreferencesRecycle.edit();
+                SharedPreferences.Editor editor=sharedPreferences.edit();
+                for(int i=0;i<selectedItems.size();i++) {
+                    Gson gson = new Gson();
+                    String json = gson.toJson(reminders.get(0));
+                    recycleEditor.putString(Config.objectReminder+i,json);
+                    recycleEditor.commit();
+                    editor.remove(Config.objectReminder+i);
+                    editor.commit();
+                    reminders.clear();
+                    NotificationManager notificationManager=(NotificationManager)getSystemService(NOTIFICATION_SERVICE);
+                    notificationManager.cancel(i);
+                    initializeReminders(0);
+                    adapter.notifyDataSetChanged();
+                }
+                return true;
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu_main, menu);
+        deleteSelectedItems = (MenuItem) menu.findItem(R.id.action_delete_selected_items);
+        return true;
     }
 
     @Override

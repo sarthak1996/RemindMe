@@ -14,8 +14,9 @@ import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.app.NotificationCompat;
 import android.widget.TimePicker;
+import android.widget.Toast;
 
-import com.example.sarthak.remindme.ObjectClasses.Reminder;
+import com.example.sarthak.remindme.ObjectClasses.ReminderAndNotes;
 import com.google.gson.Gson;
 
 import java.util.Calendar;
@@ -25,15 +26,25 @@ import java.util.Calendar;
  */
 public class RemindMeAgainNotification extends AppCompatActivity {
     private Calendar calendar;
-    private Reminder reminder;
+    private ReminderAndNotes reminder;
     private SharedPreferences sharedPreferences;
-    private int position;
+    private int position=-1;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.md_dialog_basic);
+
+        calendar=Calendar.getInstance();
+        Intent intent=getIntent();
+        if(intent!=null){
+            position=intent.getExtras().getInt(Config.reminderAt);
+        }
+        if(position==-1){
+            Toast.makeText(RemindMeAgainNotification.this, "Unable to show Time Picker", Toast.LENGTH_SHORT).show();
+            finish();
+        }
         sharedPreferences=getSharedPreferences(Config.prefName,MODE_PRIVATE);
+        retrieveReminder(position);
         TimePickerDialog.OnTimeSetListener time = new TimePickerDialog.OnTimeSetListener() {
             @Override
             public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
@@ -55,7 +66,7 @@ public class RemindMeAgainNotification extends AppCompatActivity {
         Gson gson = new Gson();
         String json = sharedPreferences.getString(Config.objectReminder + position, "");
         if (json != null && !json.equals("") && !json.isEmpty()) {
-            reminder = gson.fromJson(json, Reminder.class);
+            reminder = gson.fromJson(json, ReminderAndNotes.class);
         }
     }
     private void createNotification() {
