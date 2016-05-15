@@ -28,6 +28,5 @@ dependencies {
     compile('com.github.afollestad.material-dialogs:core:0.8.5.8@aar') {
         transitive = true
     }
-    compile 'me.grantland:autofittextview:0.2.+'
     compile 'com.google.code.gson:gson:2.5'
 }

@@ -16,7 +16,7 @@ import android.support.v7.app.NotificationCompat;
 import android.widget.TimePicker;
 import android.widget.Toast;
 
-import com.example.sarthak.remindme.ObjectClasses.ReminderAndNotes;
+import com.example.sarthak.remindme.ObjectClasses.Reminder;
 import com.google.gson.Gson;
 
 import java.util.Calendar;
@@ -26,7 +26,7 @@ import java.util.Calendar;
  */
 public class RemindMeAgainNotification extends AppCompatActivity {
     private Calendar calendar;
-    private ReminderAndNotes reminder;
+    private Reminder reminder;
     private SharedPreferences sharedPreferences;
     private int position=-1;
 
@@ -66,7 +66,7 @@ public class RemindMeAgainNotification extends AppCompatActivity {
         Gson gson = new Gson();
         String json = sharedPreferences.getString(Config.objectReminder + position, "");
         if (json != null && !json.equals("") && !json.isEmpty()) {
-            reminder = gson.fromJson(json, ReminderAndNotes.class);
+            reminder = gson.fromJson(json, Reminder.class);
         }
     }
     private void createNotification() {

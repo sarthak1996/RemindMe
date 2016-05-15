@@ -21,18 +21,17 @@ import android.view.View;
 import android.widget.Toast;
 
 import com.example.sarthak.remindme.Adapters.RecycleBinAdapter;
-import com.example.sarthak.remindme.ObjectClasses.ReminderAndNotes;
+import com.example.sarthak.remindme.ObjectClasses.RecycleBinObject;
 import com.google.gson.Gson;
 
 import java.util.ArrayList;
-import java.util.Calendar;
 
 /**
  * Created by sarthak on 13/5/16.
  */
 public class RecycleBin extends AppCompatActivity {
     private SharedPreferences sharedPreferences;
-    private ArrayList<ReminderAndNotes> reminders;
+    private ArrayList<RecycleBinObject> recycleBinObjects;
     private SparseBooleanArray selectedItems;
     private StaggeredGridLayoutManager staggeredGridLayoutManager;
     private RecyclerView recyclerView;
@@ -54,7 +53,7 @@ public class RecycleBin extends AppCompatActivity {
         actionBar.setTitle("Deleted Reminders");
 
         sharedPreferences = getSharedPreferences(Config.recycleBin, MODE_PRIVATE);
-        reminders = new ArrayList<>();
+        recycleBinObjects = new ArrayList<>();
         selectedItems = new SparseBooleanArray();
 
         /*RecyclerView For Deleted Events*/
@@ -64,8 +63,8 @@ public class RecycleBin extends AppCompatActivity {
         recyclerView = (RecyclerView) findViewById(R.id.recyclerViewDeletedReminders);
         recyclerView.setLayoutManager(staggeredGridLayoutManager);
 
-        initializeReminders(0);
-        adapter = new RecycleBinAdapter(reminders, RecycleBin.this);
+        initializeRecycleBin();
+        adapter = new RecycleBinAdapter(recycleBinObjects, RecycleBin.this);
         recyclerView.setItemAnimator(new DefaultItemAnimator());
 
         recyclerView.setAdapter(adapter);
@@ -73,12 +72,6 @@ public class RecycleBin extends AppCompatActivity {
         recyclerView.addOnItemTouchListener(new RecyclerTouchListener(getApplicationContext(), recyclerView, new RecyclerViewClickListener() {
             @Override
             public void onClick(View view, int position) {
-                Toast.makeText(getApplicationContext(), position + " is selected!", Toast.LENGTH_SHORT).show();
-                Intent intent = new Intent(RecycleBin.this, ViewReminder.class);
-                intent.putExtra(Config.reminderAt, position);
-                intent.putExtra(Config.launchType, "VIEW");
-                intent.putExtra(Config.lastReminderPosition, lastReminderPosition);
-                startActivity(intent);
             }
 
             @Override
@@ -86,7 +79,8 @@ public class RecycleBin extends AppCompatActivity {
                 cardView = (CardView) view.findViewById(R.id.cardView_DeletedReminders);
                 if (selectedItems.get(position, false)) {
                     selectedItems.delete(position);
-                    cardView.setSelected(false);
+                    recycleBinObjects.get(position).setSelected(false);
+
                 } else {
                     selectedItems.put(position, true);
                     cardView.setSelected(true);
@@ -109,14 +103,19 @@ public class RecycleBin extends AppCompatActivity {
                     intent.putExtra(Config.launchType, "ADD");
                     intent.putExtra(Config.lastReminderPosition, lastReminderPosition);
                     startActivity(intent);
+                    finish();
                 }
                 if (menuItem.getTitle().equals(RecycleBin.this.getString(R.string.notes))) {
-
+                    Intent intent=new Intent(RecycleBin.this,AllNotes.class);
+                    intent.setFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
+                    startActivity(intent);
+                    finish();
                 }
 
                 if (menuItem.getTitle().equals(RecycleBin.this.getString(R.string.upcoming_reminder))) {
                     Intent intent=new Intent(RecycleBin.this,MainActivity.class);
                     startActivity(intent);
+                    finish();
                 }
                 return true;
             }
@@ -124,20 +123,15 @@ public class RecycleBin extends AppCompatActivity {
 
     }
 
-    private void initializeReminders(int pos) {
-        int position = pos;
-        while (true) {
-            Gson gson = new Gson();
-            String json = sharedPreferences.getString(Config.objectReminder + position, "");
-            if (json == null || json.isEmpty() || json.trim().equals("")) {
-                lastReminderPosition = position;
-                break;
+    private void initializeRecycleBin() {
+        int lastRecycleId=sharedPreferences.getInt(Config.savedLastRecycleId,Integer.MIN_VALUE);
+        Gson gson=new Gson();
+        Config.lastRecycleId=lastRecycleId;
+        for(int i=Integer.MIN_VALUE;i<=lastRecycleId;i++){
+            String json=sharedPreferences.getString(Config.objectRecycle+i,"");
+            if(json!=null && !json.isEmpty() && !json.trim().equals("")){
+                recycleBinObjects.add(gson.fromJson(json,RecycleBinObject.class));
             }
-            position++;
-            ReminderAndNotes rem = gson.fromJson(json, ReminderAndNotes.class);
-            Calendar calendar = Calendar.getInstance();
-            if (rem.getDay() == calendar.get(Calendar.DAY_OF_MONTH) && rem.getMonth() == calendar.get(Calendar.MONTH) && rem.getYear() == calendar.get(Calendar.YEAR))
-                reminders.add(rem);
         }
         //Collections.sort(reminders);
     }
@@ -159,7 +153,8 @@ public class RecycleBin extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        initializeReminders(lastReminderPosition);
+        recycleBinObjects.clear();
+        initializeRecycleBin();
         adapter.notifyDataSetChanged();
     }
 

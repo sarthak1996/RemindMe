@@ -1,14 +1,19 @@
 package com.example.sarthak.remindme.Adapters;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import com.example.sarthak.remindme.ObjectClasses.ReminderAndNotes;
+import com.example.sarthak.remindme.Config;
+import com.example.sarthak.remindme.ObjectClasses.Note;
+import com.example.sarthak.remindme.ObjectClasses.RecycleBinObject;
+import com.example.sarthak.remindme.ObjectClasses.Reminder;
 import com.example.sarthak.remindme.R;
+import com.google.gson.Gson;
 
 import java.util.ArrayList;
 import java.util.Random;
@@ -17,12 +22,14 @@ import java.util.Random;
  * Created by sarthak on 13/5/16.
  */
 public class RecycleBinAdapter extends RecyclerView.Adapter<RecycleBinAdapter.CustomAdapterDeletedReminders> {
-    private ArrayList<ReminderAndNotes> reminders;
+    private ArrayList<RecycleBinObject> recycleBinObjects;
     private Context context;
     private Random random;
+    private Note note;
+    private Reminder reminder;
 
-    public RecycleBinAdapter(ArrayList<ReminderAndNotes> reminders, Context context) {
-        this.reminders = reminders;
+    public RecycleBinAdapter(ArrayList<RecycleBinObject> recycleBinObjects, Context context) {
+        this.recycleBinObjects = recycleBinObjects;
         this.context = context;
     }
 
@@ -35,16 +42,29 @@ public class RecycleBinAdapter extends RecyclerView.Adapter<RecycleBinAdapter.Cu
 
     @Override
     public void onBindViewHolder(CustomAdapterDeletedReminders holder, int position) {
-        ReminderAndNotes reminder = reminders.get(position);
-        holder.setTitle(reminder.getTitle());
-        holder.setDescription(reminder.getDescription());
-        String modifiedText = "" + reminder.getDay() + " " + getMonth(reminder.getMonth()) + " , " + reminder.getYear();
-        holder.setDate(modifiedText);
-        if (reminder.getMinutes() == -1 || reminder.getHours() == -1)
-            modifiedText = "All day";
-        else
-            modifiedText=""+reminder.getHours()+":"+reminder.getMinutes();
-        holder.setTime(modifiedText);
+        RecycleBinObject recycleBinObject = recycleBinObjects.get(position);
+        if(recycleBinObject.getType().equals(Config.objectNote)){
+            getNote(recycleBinObject);
+            holder.setTitle(note.getNote());
+        }
+//        holder.setTitle(reminder.getTitle());
+//        holder.setDescription(reminder.getDescription());
+//        String modifiedText = "" + reminder.getDay() + " " + getMonth(reminder.getMonth()) + " , " + reminder.getYear();
+//        holder.setDate(modifiedText);
+//        if (reminder.getMinutes() == -1 || reminder.getHours() == -1)
+//            modifiedText = "All day";
+//        else
+//            modifiedText=""+reminder.getHours()+":"+reminder.getMinutes();
+//        holder.setTime(modifiedText);
+    }
+
+    private void getNote(RecycleBinObject recycleBinObject){
+        SharedPreferences sharedPreferences=context.getSharedPreferences(Config.notesDirectory,Context.MODE_PRIVATE);
+        Gson gson=new Gson();
+        String json=sharedPreferences.getString(Config.objectNote+recycleBinObject.getId(),"");
+        if(json!=null && !json.isEmpty() && !json.trim().equals("")){
+            note=gson.fromJson(json,Note.class);
+        }
     }
 
     private String getMonth(int month) {
@@ -54,7 +74,7 @@ public class RecycleBinAdapter extends RecyclerView.Adapter<RecycleBinAdapter.Cu
 
     @Override
     public int getItemCount() {
-        return reminders.size();
+        return recycleBinObjects.size();
     }
 
     public class CustomAdapterDeletedReminders extends RecyclerView.ViewHolder {

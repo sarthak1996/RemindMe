@@ -28,8 +28,8 @@ import android.widget.Toast;
 
 import com.afollestad.materialdialogs.DialogAction;
 import com.afollestad.materialdialogs.MaterialDialog;
-import com.example.sarthak.remindme.Adapters.UpcomingRemindersAdapter;
-import com.example.sarthak.remindme.ObjectClasses.ReminderAndNotes;
+import com.example.sarthak.remindme.Adapters.RemindersAdapter;
+import com.example.sarthak.remindme.ObjectClasses.Reminder;
 import com.google.gson.Gson;
 
 import java.util.ArrayList;
@@ -40,8 +40,8 @@ import java.util.Calendar;
  */
 public class MainActivity extends AppCompatActivity {
     private StaggeredGridLayoutManager staggeredGridLayoutManager;
-    private ArrayList<ReminderAndNotes> reminders;
-    private UpcomingRemindersAdapter adapter;
+    private ArrayList<Reminder> reminders;
+    private RemindersAdapter adapter;
     private RecyclerView recyclerView;
     private SparseBooleanArray selectedItems;
     private CardView cardView;
@@ -77,7 +77,7 @@ public class MainActivity extends AppCompatActivity {
         recyclerView = (RecyclerView) findViewById(R.id.recyclerViewUpComingReminders);
         recyclerView.setLayoutManager(staggeredGridLayoutManager);
         initializeReminders(0);
-        adapter = new UpcomingRemindersAdapter(reminders, MainActivity.this);
+        adapter = new RemindersAdapter(reminders, MainActivity.this);
         recyclerView.setItemAnimator(new DefaultItemAnimator());
 
         recyclerView.setAdapter(adapter);
@@ -95,7 +95,7 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public void onLongClick(View view, int position) {
-                cardView = (CardView) view.findViewById(R.id.cardView_UpcomingReminders);
+                cardView = (CardView) view.findViewById(R.id.cardView_Reminders);
                 if (selectedItems.get(position, false)) {
                     selectedItems.delete(position);
                     cardView.setCardBackgroundColor(Color.WHITE);
@@ -117,17 +117,19 @@ public class MainActivity extends AppCompatActivity {
                 menuItem.setChecked(true);
                 drawerLayout.closeDrawers();
                 if (menuItem.getTitle().equals(MainActivity.this.getString(R.string.reminder))) {
-                    Intent intent = new Intent(MainActivity.this, ViewReminder.class);
-                    intent.putExtra(Config.launchType, "ADD");
-                    intent.putExtra(Config.lastReminderPosition, lastReminderPosition);
+                    Intent intent=new Intent(MainActivity.this,AllReminders.class);
                     startActivity(intent);
+                    finish();
                 }
                 if (menuItem.getTitle().equals(MainActivity.this.getString(R.string.notes))) {
-
+                    Intent intent=new Intent(MainActivity.this,AllNotes.class);
+                    startActivity(intent);
+                    finish();
                 }
                 if (menuItem.getTitle().equals(MainActivity.this.getString(R.string.recycle_bin))) {
                     Intent intent=new Intent(MainActivity.this,RecycleBin.class);
                     startActivity(intent);
+                    finish();
                 }
                 if (menuItem.getTitle().equals(MainActivity.this.getString(R.string.upcoming_reminder))) {
                     /*Do nothing since already in the main activity*/
@@ -195,7 +197,7 @@ public class MainActivity extends AppCompatActivity {
                 break;
             }
             position++;
-            ReminderAndNotes rem = gson.fromJson(json, ReminderAndNotes.class);
+            Reminder rem = gson.fromJson(json, Reminder.class);
             Calendar calendar = Calendar.getInstance();
             if (rem.getDay() == calendar.get(Calendar.DAY_OF_MONTH) && rem.getMonth() == calendar.get(Calendar.MONTH) && rem.getYear() == calendar.get(Calendar.YEAR))
                 reminders.add(rem);
@@ -248,7 +250,8 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        initializeReminders(lastReminderPosition);
+        reminders.clear();
+        initializeReminders(0);
         adapter.notifyDataSetChanged();
     }
 }

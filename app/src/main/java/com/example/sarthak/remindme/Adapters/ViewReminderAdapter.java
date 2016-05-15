@@ -11,7 +11,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.example.sarthak.remindme.Config;
-import com.example.sarthak.remindme.ObjectClasses.ReminderAndNotes;
+import com.example.sarthak.remindme.ObjectClasses.Reminder;
 import com.example.sarthak.remindme.ObjectClasses.ViewReminderObject;
 import com.example.sarthak.remindme.R;
 import com.google.gson.Gson;
@@ -23,7 +23,7 @@ import java.util.ArrayList;
  */
 public class ViewReminderAdapter extends RecyclerView.Adapter<ViewReminderAdapter.CustomAdapterViewReminder> {
     private ArrayList<ViewReminderObject> viewReminderObjects;
-    private ReminderAndNotes reminder;
+    private Reminder reminder;
     private Context context;
     private int flag;
     private int position;
@@ -41,7 +41,7 @@ public class ViewReminderAdapter extends RecyclerView.Adapter<ViewReminderAdapte
         View itemView = LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.adapter_view_reminders, parent, false);
         sharedPreferences = context.getSharedPreferences(Config.prefName, Context.MODE_PRIVATE);
-        reminder = new ReminderAndNotes();
+        reminder = new Reminder();
         return new CustomAdapterViewReminder(itemView);
     }
 
@@ -72,7 +72,7 @@ public class ViewReminderAdapter extends RecyclerView.Adapter<ViewReminderAdapte
         Gson gson = new Gson();
         String json = sharedPreferences.getString(Config.objectReminder + position, "");
         if (json != null && !json.equals("") && !json.isEmpty()) {
-            reminder = gson.fromJson(json, ReminderAndNotes.class);
+            reminder = gson.fromJson(json, Reminder.class);
         }
     }
 

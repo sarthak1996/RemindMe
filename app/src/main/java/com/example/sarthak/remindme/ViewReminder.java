@@ -20,6 +20,7 @@ import android.support.v7.app.NotificationCompat;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.View;
 import android.widget.DatePicker;
 import android.widget.EditText;
@@ -31,7 +32,7 @@ import android.widget.Toast;
 import com.afollestad.materialdialogs.DialogAction;
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.example.sarthak.remindme.Adapters.ViewReminderAdapter;
-import com.example.sarthak.remindme.ObjectClasses.ReminderAndNotes;
+import com.example.sarthak.remindme.ObjectClasses.Reminder;
 import com.example.sarthak.remindme.ObjectClasses.ViewReminderObject;
 import com.google.gson.Gson;
 
@@ -45,7 +46,7 @@ public class ViewReminder extends AppCompatActivity {
     private int position = -1;
     private RecyclerView recyclerView;
     private ViewReminderAdapter adapter;
-    private ReminderAndNotes reminder;
+    private Reminder reminder;
     private int lastReminderPosition;
     private int flag = 0;
     private Calendar calendar;
@@ -84,7 +85,7 @@ public class ViewReminder extends AppCompatActivity {
         actionBar.setDisplayHomeAsUpEnabled(true);
         actionBar.setDisplayHomeAsUpEnabled(true);
 
-        reminder = new ReminderAndNotes();
+        reminder = new Reminder();
         sharedPreferences = getSharedPreferences(Config.prefName, MODE_PRIVATE);
         textViewTitle = (TextView) findViewById(R.id.textView_ViewReminderTitle);
         if (flag == 0) {
@@ -128,6 +129,7 @@ public class ViewReminder extends AppCompatActivity {
                             public void onDateSet(DatePicker view, int year, int monthOfYear,
                                                   int dayOfMonth) {
                                 // TODO Auto-generated method stub
+                                calendar.setTimeInMillis(System.currentTimeMillis());
                                 calendar.set(Calendar.YEAR, year);
                                 calendar.set(Calendar.MONTH, monthOfYear);
                                 calendar.set(Calendar.DAY_OF_MONTH, dayOfMonth);
@@ -222,7 +224,13 @@ public class ViewReminder extends AppCompatActivity {
                 calendar.set(Calendar.SECOND, 0);
                 reminder.setHours(hourOfDay);
                 reminder.setMinutes(minute);
-                reminder.setTimeInMillis(calendar.getTimeInMillis());
+                calendar.set(Calendar.DAY_OF_MONTH,reminder.getDay());
+                calendar.set(Calendar.MONTH,reminder.getMonth());
+                calendar.set(Calendar.YEAR,reminder.getYear());
+                long millis=calendar.getTimeInMillis();
+                Log.d("Calendar",""+calendar.get(Calendar.DAY_OF_MONTH)+","+calendar.get(Calendar.MONTH)+","+calendar.get(Calendar.YEAR)+"@"+calendar.get(Calendar.HOUR_OF_DAY)+":"+calendar.get(Calendar.MINUTE));
+                Log.d("MillisTime",""+millis);
+                reminder.setTimeInMillis(millis);
                 modifiedText += "@" + reminder.getHours() + ":" + reminder.getMinutes();
                 updateText(R.id.textView_ViewReminderInfoListElement, modifiedText, itemView, true, "@");
                 createNotification();
@@ -297,7 +305,7 @@ public class ViewReminder extends AppCompatActivity {
         Gson gson = new Gson();
         String json = sharedPreferences.getString(Config.objectReminder + position, "");
         if (json != null && !json.equals("") && !json.isEmpty()) {
-            reminder = gson.fromJson(json, ReminderAndNotes.class);
+            reminder = gson.fromJson(json, Reminder.class);
         }
     }
 
