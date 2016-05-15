@@ -22,5 +22,7 @@
     <string name="recycle_bin">Recycle Bin</string>
     <string name="action_delete_selected_items">Delete</string>
     <string name="upcoming_reminder">Upcoming Reminders</string>
+    <string name="action_restore_selected_items">Restore</string>
+    <string name="action_delete_selected_items_forever">Delete Forever</string>
 
 </resources>

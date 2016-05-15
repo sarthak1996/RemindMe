@@ -52,7 +52,7 @@ public class MainActivity extends AppCompatActivity {
     private FloatingActionButton floatingActionButtonAdd;
     private String choicesAdd[]={"Note","Reminder","Location Based Reminder"};
     private int selectionMadeAdd=-1;
-
+    private Intent intent;
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -158,9 +158,12 @@ public class MainActivity extends AppCompatActivity {
                                 Log.d("Check",""+selectionMadeAdd);
                                 switch (selectionMadeAdd){
                                     case 0:
+                                        intent=new Intent(MainActivity.this,AddNote.class);
+                                        intent.putExtra(Config.launchType,"ADD");
+                                        startActivity(intent);
                                         break;
                                     case 1:
-                                        Intent intent = new Intent(MainActivity.this, ViewReminder.class);
+                                        intent = new Intent(MainActivity.this, ViewReminder.class);
                                         intent.putExtra(Config.launchType, "ADD");
                                         intent.putExtra(Config.lastReminderPosition, lastReminderPosition);
                                         startActivity(intent);
