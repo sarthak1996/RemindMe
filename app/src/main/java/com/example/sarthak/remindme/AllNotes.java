@@ -80,12 +80,28 @@ public class AllNotes extends AppCompatActivity {
         recyclerView.addOnItemTouchListener(new RecyclerTouchListener(getApplicationContext(), recyclerView, new RecyclerViewClickListener() {
             @Override
             public void onClick(View view, int position) {
-                Toast.makeText(getApplicationContext(), position + " is selected!", Toast.LENGTH_SHORT).show();
-                Intent intent = new Intent(AllNotes.this, AddNote.class);
-                Log.d("IntentCheck", "" + notes.get(position).getId());
-                intent.putExtra(Config.noteAt, notes.get(position).getId());
-                intent.putExtra(Config.launchType, "VIEW");
-                startActivityForResult(intent, ADD_NOTES_ACTIVITY);
+                if(selectedItems.size()==0) {
+                    Intent intent = new Intent(AllNotes.this, AddNote.class);
+                    intent.putExtra(Config.noteAt, notes.get(position).getId());
+                    intent.putExtra(Config.launchType, "VIEW");
+                    startActivityForResult(intent, ADD_NOTES_ACTIVITY);
+                }else{
+                    cardView = (CardView) view.findViewById(R.id.cardView_notes);
+                    if (selectedItems.get(position, false)) {
+                        selectedItems.delete(position);
+                        notes.get(position).setSelected(false);
+                        if(selectedItems.size()==0){
+                            deleteSelectedItems.setVisible(false);
+                        }
+                        Log.d("In non selected",""+position+","+selectedItems.size());
+                    } else {
+                        selectedItems.put(position, true);
+                        notes.get(position).setSelected(true);
+                        deleteSelectedItems.setVisible(true);
+                        Log.d("In selected",""+position+","+selectedItems.size());
+                    }
+                    adapter.notifyDataSetChanged();
+                }
             }
 
             @Override
@@ -96,12 +112,13 @@ public class AllNotes extends AppCompatActivity {
                     notes.get(position).setSelected(false);
                     if(selectedItems.size()==0){
                         deleteSelectedItems.setVisible(false);
-                        Log.d("In non selected","true");
                     }
+                    Log.d("In non selected",""+position+","+selectedItems.size());
                 } else {
                     selectedItems.put(position, true);
                     notes.get(position).setSelected(true);
                     deleteSelectedItems.setVisible(true);
+                    Log.d("In selected",""+position+","+selectedItems.size());
                 }
                 adapter.notifyDataSetChanged();
             }
@@ -152,18 +169,15 @@ public class AllNotes extends AppCompatActivity {
 
     private void initializeNotes() {
         Gson gson = new Gson();
-
-        for (int i = Integer.MIN_VALUE; i <= sharedPreferences.getInt(Config.savedLastNotesId, Integer.MIN_VALUE); i++) {
-            Log.d("SkippedIf", "?");
+        Config.lastNoteId=sharedPreferences.getInt(Config.savedLastNotesId, Integer.MIN_VALUE);
+        for (int i = Integer.MIN_VALUE; i <= Config.lastNoteId; i++) {
             String savedNote = sharedPreferences.getString(Config.objectNote + i, "");
             if (savedNote != null && !savedNote.isEmpty() && !savedNote.trim().equals("")) {
                 Note retrievedNote = gson.fromJson(savedNote, Note.class);
-                Log.d("CheckedNote", "" + retrievedNote.getNote());
                 if (retrievedNote.isVisible())
                     notes.add(retrievedNote);
             }
         }
-        Toast.makeText(AllNotes.this, "haha" + notes.size(), Toast.LENGTH_SHORT).show();
     }
 
     @Override
@@ -178,7 +192,6 @@ public class AllNotes extends AppCompatActivity {
                 drawerLayout.openDrawer(GravityCompat.START);
                 return true;
             case R.id.action_delete_selected_items:
-                Toast.makeText(AllNotes.this, "", Toast.LENGTH_SHORT).show();
                 deleteSelectedNotes();
                 return true;
         }
@@ -219,22 +232,31 @@ public class AllNotes extends AppCompatActivity {
             if(selectedItems.get(i,false)){
                 Note modifiedNote=notes.get(i);
                 modifiedNote.setVisible(false);
-                Log.d("In delete Notes",""+modifiedNote.getNote());
+
                 String json= gson.toJson(modifiedNote);
                 editor.putString(Config.objectNote+modifiedNote.getId(),json);
                 editor.commit();
-                notes.remove(i);
+
+
                 RecycleBinObject obj=new RecycleBinObject();
                 obj.setType(Config.objectNote);
                 obj.setId(modifiedNote.getId());
+                obj.setSelfId(Config.lastRecycleId);
                 json=gson.toJson(obj);
-                /*To create another variable for recycle items*/
-                recycleEditor.putString(Config.objectRecycle+recycleSharedPref.getInt(Config.savedLastRecycleId,Integer.MIN_VALUE),json);
-                recycleEditor.commit();
-                recycleEditor.putInt(Config.savedLastRecycleId,Config.lastRecycleId);
+                Config.lastRecycleId=recycleSharedPref.getInt(Config.savedLastRecycleId,Integer.MIN_VALUE);
+                recycleEditor.putString(Config.objectRecycle+Config.lastRecycleId,json);
                 recycleEditor.commit();
                 Config.lastRecycleId++;
-                i--;
+                recycleEditor.putInt(Config.savedLastRecycleId,Config.lastRecycleId);
+                recycleEditor.commit();
+
+            }
+        }
+        for (int i=notes.size()-1;i>=0;i--){
+            if(selectedItems.get(i,false)) {
+                selectedItems.delete(i);
+                Log.d("In delete Notes",""+notes.get(i).getNote());
+                notes.remove(i);
             }
         }
         selectedItems.clear();

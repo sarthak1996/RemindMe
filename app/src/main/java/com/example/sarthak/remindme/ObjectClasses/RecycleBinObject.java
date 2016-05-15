@@ -6,6 +6,7 @@ package com.example.sarthak.remindme.ObjectClasses;
 public class RecycleBinObject {
     private String type;
     private int id;
+    private int selfId;
     private boolean selected;
 
     public RecycleBinObject() {
@@ -33,5 +34,13 @@ public class RecycleBinObject {
 
     public void setSelected(boolean selected) {
         this.selected = selected;
+    }
+
+    public int getSelfId() {
+        return selfId;
+    }
+
+    public void setSelfId(int selfId) {
+        this.selfId = selfId;
     }
 }

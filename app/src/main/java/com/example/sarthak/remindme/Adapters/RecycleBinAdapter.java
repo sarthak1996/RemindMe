@@ -2,6 +2,8 @@ package com.example.sarthak.remindme.Adapters;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.graphics.Color;
+import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -46,6 +48,11 @@ public class RecycleBinAdapter extends RecyclerView.Adapter<RecycleBinAdapter.Cu
         if(recycleBinObject.getType().equals(Config.objectNote)){
             getNote(recycleBinObject);
             holder.setTitle(note.getNote());
+            if(recycleBinObject.isSelected()){
+                holder.getCardView().setCardBackgroundColor(Color.GRAY);
+            }else{
+                holder.getCardView().setCardBackgroundColor(Color.WHITE);
+            }
         }
 //        holder.setTitle(reminder.getTitle());
 //        holder.setDescription(reminder.getDescription());
@@ -82,6 +89,7 @@ public class RecycleBinAdapter extends RecyclerView.Adapter<RecycleBinAdapter.Cu
         private TextView description;
         private TextView date;
         private TextView time;
+        private CardView cardView;
 
         public CustomAdapterDeletedReminders(View view) {
             super(view);
@@ -90,6 +98,7 @@ public class RecycleBinAdapter extends RecyclerView.Adapter<RecycleBinAdapter.Cu
             this.description = (TextView) view.findViewById(R.id.textView_DeletedRemindersDescription);
             this.date = (TextView) view.findViewById(R.id.textView_DeletedRemindersDate);
             this.time = (TextView) view.findViewById(R.id.textView_DeletedRemindersTime);
+            this.cardView=(CardView)view.findViewById(R.id.cardView_DeletedReminders);
         }
 
         public void setTitle(String title) {
@@ -106,6 +115,10 @@ public class RecycleBinAdapter extends RecyclerView.Adapter<RecycleBinAdapter.Cu
 
         public void setTime(String time) {
             this.time.setText(time);
+        }
+
+        public CardView getCardView(){
+            return cardView;
         }
     }
 }

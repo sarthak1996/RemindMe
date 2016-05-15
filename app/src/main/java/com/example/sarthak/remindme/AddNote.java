@@ -7,6 +7,7 @@ import android.support.annotation.Nullable;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.MenuItem;
 import android.widget.EditText;
 import android.widget.Toast;
@@ -92,6 +93,9 @@ public class AddNote extends AppCompatActivity {
     }
 
     private void saveNote() {
+        Config.lastNoteId=sharedPreferences.getInt(Config.savedLastNotesId,Integer.MIN_VALUE);
+        int offset=Config.lastNoteId-Integer.MIN_VALUE;
+        Log.d("Last note id",""+offset);
         Gson gson = new Gson();
         note.setId(Config.lastNoteId);
         String json = gson.toJson(note);

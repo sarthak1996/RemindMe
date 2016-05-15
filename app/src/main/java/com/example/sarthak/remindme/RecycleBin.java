@@ -15,13 +15,17 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.util.SparseBooleanArray;
+import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
 
 import com.example.sarthak.remindme.Adapters.RecycleBinAdapter;
+import com.example.sarthak.remindme.ObjectClasses.Note;
 import com.example.sarthak.remindme.ObjectClasses.RecycleBinObject;
+import com.example.sarthak.remindme.ObjectClasses.Reminder;
 import com.google.gson.Gson;
 
 import java.util.ArrayList;
@@ -38,6 +42,8 @@ public class RecycleBin extends AppCompatActivity {
     private DrawerLayout drawerLayout;
     private int lastReminderPosition=0;
     private CardView cardView;
+    private MenuItem restoreSelectedItems;
+    private MenuItem deleteSelectedItems;
     private RecycleBinAdapter adapter;
 
     @Override
@@ -72,6 +78,25 @@ public class RecycleBin extends AppCompatActivity {
         recyclerView.addOnItemTouchListener(new RecyclerTouchListener(getApplicationContext(), recyclerView, new RecyclerViewClickListener() {
             @Override
             public void onClick(View view, int position) {
+                if(selectedItems.size()!=0){
+                    cardView = (CardView) view.findViewById(R.id.cardView_DeletedReminders);
+                    if (selectedItems.get(position, false)) {
+                        selectedItems.delete(position);
+                        recycleBinObjects.get(position).setSelected(false);
+                        if(selectedItems.size()==0){
+                            deleteSelectedItems.setVisible(false);
+                            restoreSelectedItems.setVisible(false);
+                        }
+                        Log.d("In non selected",""+position+","+selectedItems.size());
+                    } else {
+                        selectedItems.put(position, true);
+                        recycleBinObjects.get(position).setSelected(true);
+                        deleteSelectedItems.setVisible(true);
+                        restoreSelectedItems.setVisible(true);
+                        Log.d("In selected",""+position+","+selectedItems.size());
+                    }
+                    adapter.notifyDataSetChanged();
+                }
             }
 
             @Override
@@ -80,11 +105,19 @@ public class RecycleBin extends AppCompatActivity {
                 if (selectedItems.get(position, false)) {
                     selectedItems.delete(position);
                     recycleBinObjects.get(position).setSelected(false);
-
+                    if(selectedItems.size()==0){
+                        deleteSelectedItems.setVisible(false);
+                        restoreSelectedItems.setVisible(false);
+                    }
+                    Log.d("In non selected",""+position+","+selectedItems.size());
                 } else {
                     selectedItems.put(position, true);
-                    cardView.setSelected(true);
+                    recycleBinObjects.get(position).setSelected(true);
+                    deleteSelectedItems.setVisible(true);
+                    restoreSelectedItems.setVisible(true);
+                    Log.d("In selected",""+position+","+selectedItems.size());
                 }
+                adapter.notifyDataSetChanged();
             }
         }));
 
@@ -124,10 +157,11 @@ public class RecycleBin extends AppCompatActivity {
     }
 
     private void initializeRecycleBin() {
-        int lastRecycleId=sharedPreferences.getInt(Config.savedLastRecycleId,Integer.MIN_VALUE);
+        Config.lastRecycleId=sharedPreferences.getInt(Config.savedLastRecycleId,Integer.MIN_VALUE);
         Gson gson=new Gson();
-        Config.lastRecycleId=lastRecycleId;
-        for(int i=Integer.MIN_VALUE;i<=lastRecycleId;i++){
+        int offset=Config.lastRecycleId-Integer.MIN_VALUE;
+        Log.d("Last Recycle ID",""+offset);
+        for(int i=Integer.MIN_VALUE;i<=Config.lastRecycleId;i++){
             String json=sharedPreferences.getString(Config.objectRecycle+i,"");
             if(json!=null && !json.isEmpty() && !json.trim().equals("")){
                 recycleBinObjects.add(gson.fromJson(json,RecycleBinObject.class));
@@ -146,16 +180,79 @@ public class RecycleBin extends AppCompatActivity {
             case android.R.id.home:
                 drawerLayout.openDrawer(GravityCompat.START);
                 return true;
+            case R.id.action_delete_selected_items_forever:
+                deleteForever();
+                return true;
+            case R.id.action_restore_selected_items:
+                restoreItems();
+                return true;
         }
 
         return super.onOptionsItemSelected(item);
     }
+
     @Override
-    protected void onResume() {
-        super.onResume();
-        recycleBinObjects.clear();
-        initializeRecycleBin();
+    protected void onPause() {
+        super.onPause();
+        SharedPreferences.Editor editor=sharedPreferences.edit();
+        editor.putInt(Config.savedLastRecycleId,Config.lastRecycleId);
+        editor.commit();
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu_recycle_bin, menu);
+        deleteSelectedItems = (MenuItem) menu.findItem(R.id.action_delete_selected_items_forever);
+        restoreSelectedItems=(MenuItem) menu.findItem(R.id.action_restore_selected_items);
+        return true;
+    }
+
+    private void restoreItems(){
+        SharedPreferences.Editor editor=sharedPreferences.edit();
+        SharedPreferences reminderSharedPreferences=getSharedPreferences(Config.prefName,MODE_PRIVATE);
+        SharedPreferences notesSharedPreferences=getSharedPreferences(Config.notesDirectory,MODE_PRIVATE);
+        SharedPreferences.Editor reminderEditor=reminderSharedPreferences.edit();
+        SharedPreferences.Editor notesEditor=notesSharedPreferences.edit();
+        Note note;
+        Reminder reminder;
+        Gson gson=new Gson();
+        for(int i=0;i<recycleBinObjects.size();i++){
+            if(selectedItems.get(i,false)){
+                int id=recycleBinObjects.get(i).getId();
+                if(recycleBinObjects.get(i).getType().equals(Config.objectNote)){
+                    String json=notesSharedPreferences.getString(Config.objectNote+id,"");
+                    if(json!=null && !json.isEmpty() && !json.trim().equals("")){
+                        note=gson.fromJson(json,Note.class);
+                        note.setVisible(true);
+                        note.setSelected(false);
+                        json=gson.toJson(note);
+                        notesEditor.putString(Config.objectNote+id,json);
+                        notesEditor.commit();
+
+                        /*Removing object from recycle bin*/
+                        /*To check this portion of code*/
+                        editor.remove(Config.objectRecycle+recycleBinObjects.get(i).getSelfId());
+                        editor.commit();
+                    }
+                }else if(recycleBinObjects.get(i).getType().equals(Config.objectReminder)){
+
+                }
+            }
+        }
+
+        for(int i=recycleBinObjects.size()-1;i>=0;i--){
+            if(selectedItems.get(i,false)){
+                selectedItems.delete(i);
+                recycleBinObjects.remove(i);
+            }
+        }
+        selectedItems.clear();
+        deleteSelectedItems.setVisible(false);
+        restoreSelectedItems.setVisible(false);
         adapter.notifyDataSetChanged();
     }
 
+    private void deleteForever(){
+
+    }
 }
